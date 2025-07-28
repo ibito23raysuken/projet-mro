@@ -1,25 +1,35 @@
 import { useState } from 'react';
-import { FaBars, FaTimes, FaUser, FaBell } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 export default function TopBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   return (
-    <header className="bg-royal-blue-900 text-white shadow-lg sticky top-0 z-50">
+    <header className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold tracking-tight">MRO</h1>
-          </div>
+          {/* Logo et nom */}
+                      <Link 
+              to="/" 
+            >
+              <div className="flex items-center space-x-3">
+                <div className="bg-royal-blue-700 h-10 w-10 rounded-full flex items-center justify-center">
+                  <span className="font-bold text-xl">M</span>
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight">MRO</h1>
+              </div>
+            </Link>
+
           
-          {/* Navigation Desktop */}
-          
-          {/* Actions utilisateur */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button className="bg-royal-blue-600 hover:bg-royal-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+          {/* Bouton Connexion - Version Desktop */}
+          <div className="hidden md:block">
+            <Link 
+              to="/login" 
+              className="bg-royal-blue-600 hover:bg-royal-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
               Connexion
-            </button>
+            </Link>
           </div>
           
           {/* Menu Mobile Button */}
@@ -31,25 +41,18 @@ export default function TopBar() {
           </button>
         </div>
         
-        {/* Menu Mobile */}
+        {/* Menu Mobile Simplifié */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-royal-blue-700">
-            <ul className="flex flex-col space-y-4">
-              <li>
-                <a 
-                  href="/" 
-                  className="block py-2 font-medium hover:text-royal-blue-200 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Accueil
-                </a>
-              </li>
-              <li className="pt-4 flex space-x-4">
-                <button className="bg-royal-blue-600 hover:bg-royal-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors w-full">
-                  Connexion
-                </button>
-              </li>
-            </ul>
+            <div className="pt-2">
+              <Link 
+                to="/login" 
+                className="bg-royal-blue-600 hover:bg-royal-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors w-full block text-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Connexion
+              </Link>
+            </div>
           </div>
         )}
       </div>
