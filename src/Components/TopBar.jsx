@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-
+import logo from '../assets/purojekuto.svg'; // Assurez-vous que le chemin est correct
 export default function TopBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -13,10 +13,15 @@ export default function TopBar() {
                       <Link 
               to="/" 
             >
+              
               <div className="flex items-center space-x-3">
-                <div className="bg-royal-blue-700 h-10 w-10 rounded-full flex items-center justify-center">
-                  <span className="font-bold text-xl">M</span>
-                </div>
+            <div className=" flex items-center justify-center">
+                <img 
+        src={logo} 
+        alt="MRO Logo" 
+        className="w-10 h-10 mx-auto object-contain" 
+      />
+            </div>
                 <h1 className="text-2xl font-bold tracking-tight">MRO</h1>
               </div>
             </Link>
