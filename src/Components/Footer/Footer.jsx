@@ -1,3 +1,4 @@
+import logo from '../../assets/purojekuto.svg'; 
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
@@ -6,8 +7,12 @@ export default function Footer() {
           {/* Colonne 1 : Logo et description */}
           <div>
             <div className="flex items-center mb-4">
-              <div className="bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                <span className="font-bold text-xl">M</span>
+              <div className=" w-10 h-10 flex items-center justify-center mr-3">
+                                <img 
+                        src={logo} 
+                        alt="MRO Logo" 
+                        className="bg-white-900 w-10 h-10 mx-auto object-contain" 
+                      />
               </div>
               <h2 className="text-2xl font-bold">MRO</h2>
             </div>

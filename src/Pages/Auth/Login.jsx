@@ -1,24 +1,68 @@
 import { useState } from 'react';
+import { useContext } from 'react';
+import { AppContext } from './../../Context/AppContext';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaShieldAlt } from 'react-icons/fa';
-import logo from '../../assets/purojekuto.svg'; // Assurez-vous que le chemin est correct
+import logo from '../../assets/purojekuto.svg'; 
+import { Link, useNavigate } from 'react-router-dom';
+
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({ username: '', password: '', global: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  // URL de l'API
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const { setUser,setToken } = useContext(AppContext);
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simuler une requête d'authentification
-    setTimeout(() => {
-      console.log('Connexion avec:', { username, password, rememberMe });
+    setErrors({ username: '', password: '', global: '' });
+
+    try {
+      const response = await fetch(`${apiUrl}/api/securities/auth/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Échec de la connexion');
+      }
+      const authHeader = response.headers.get('x-amzn-remapped-authorization');
+      if (!authHeader) {
+        throw new Error('Token non trouvé dans les headers');
+      }
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+      console.log( token);  
+      console.log(responseData);
+     localStorage.setItem("Token", token);
+     localStorage.setItem("User", JSON.stringify(responseData));
+
+     // Met à jour le contexte
+    setToken(token);
+    setUser(JSON.stringify(responseData));
+    navigate('/');
+
+    } catch (error) {
+      if (error.message.toLowerCase().includes('utilisateur')) {
+        setErrors(prev => ({ ...prev, username: error.message }));
+      } else if (error.message.toLowerCase().includes('mot de passe')) {
+        setErrors(prev => ({ ...prev, password: error.message }));
+      } else {
+        setErrors(prev => ({ ...prev, global: error.message }));
+      }
+    } finally {
       setIsLoading(false);
-      // Ici vous redirigeriez normalement l'utilisateur
-    }, 1500);
+    }
   };
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br  p-4 relative overflow-hidden">
@@ -26,23 +70,23 @@ export default function Login() {
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png')] opacity-10"></div>
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full opacity-10 blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-600 rounded-full opacity-10 blur-3xl"></div>
-      
+
       {/* Carte de connexion */}
       <div className="bg-gray-800 border border-gray-700 rounded-2xl shadow-xl z-10 w-full max-w-md overflow-hidden backdrop-blur-sm">
         <div className="p-8">
           {/* En-tête avec logo */}
           <div className="flex flex-col items-center mb-8">
             <div className=" w-20 h-20  flex items-center justify-center">
-                <img 
-        src={logo} 
-        alt="MRO Logo" 
-        className="w-24 h-24 mx-auto object-contain" 
-      />
+              <img
+                src={logo}
+                alt="MRO Logo"
+                className="w-24 h-24 mx-auto object-contain"
+              />
             </div>
             <h1 className="text-3xl font-bold text-white">MRO</h1>
             <p className="text-blue-300 mt-1 font-medium">Management Ressource Organizer</p>
           </div>
-          
+
           {/* Formulaire */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -60,11 +104,17 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   className="bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent block w-full pl-10 p-3 placeholder-blue-300"
                   placeholder="Entrez votre nom d'utilisateur"
+                  autoComplete="username"
                   required
                 />
               </div>
+              {errors.username && (
+                <div className="text-red-500 text-sm mb-4">
+                  {errors.username}
+                </div>
+              )}
             </div>
-            
+
             <div>
               <label className="block text-blue-100 text-sm font-medium mb-2" htmlFor="password">
                 Mot de passe
@@ -74,13 +124,14 @@ export default function Login() {
                   <FaLock className="text-blue-400" />
                 </div>
                 <input
-                  id="password"
+                  id="current-password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent block w-full pl-10 p-3 pr-10 placeholder-blue-300"
                   placeholder="Entrez votre mot de passe"
                   required
+                  className="bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent block w-full pl-10 p-3 pr-10 placeholder-blue-300"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
@@ -94,17 +145,19 @@ export default function Login() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <div className="text-red-500 text-sm mb-4">
+                  {errors.password}
+                </div>
+              )}
             </div>
-            
 
-            
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
-                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
               >
                 {isLoading ? (
                   <>
@@ -118,9 +171,9 @@ export default function Login() {
               </button>
             </div>
           </form>
-          
+
         </div>
-        
+
       </div>
     </div>
   );

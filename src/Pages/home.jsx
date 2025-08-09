@@ -6,13 +6,13 @@ export default function Home() {
   const [error, setError] = useState(null);
   
   // URL de l'API
-  const apiUrl = 'https://pffp67w9yb.execute-api.us-east-1.amazonaws.com/dev/ping';
+  const apiUrl = import.meta.env.VITE_API_URL_DEV;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        const response = await fetch(apiUrl);
+        setLoading(true);         
+        const response = await fetch(`${apiUrl}/ping`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

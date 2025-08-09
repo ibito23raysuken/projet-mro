@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Suspense } from 'react';
-import Footer from "./Components/Footer";
-import TopBar from "./Components/TopBar";
+import Footer from "./Components/Footer/Footer";
+import TopBar from "./Components/TopBar/TopBar";
 
 export default function Layout() {
   return (
