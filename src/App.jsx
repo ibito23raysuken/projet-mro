@@ -6,6 +6,7 @@ import Layout from './Layout';
 import  Home from './Pages/home';
 import Login from  './Pages/Auth/Login'; 
 import Product from './Pages/Product/Product';
+import CreateProduct from './Pages/Product/Create';
 export default function App() {
   const { token } = useContext(AppContext);
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={token ? <Product /> : <Home />} />
           <Route path="/login" element={token ? <Product /> : <Login />}/>
+          <Route path="/ajout_produits" element={token ? <CreateProduct /> : <Login />}/>
         </Route>
 
         

@@ -1,14 +1,7 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect, useContext } from 'react';
+import { AppContext } from './../../Context/AppContext';
+import { Link, useNavigate } from 'react-router-dom';
 const initialProducts = [
-  { id: 1, name: 'Produit A', price: 20 },
-  { id: 2, name: 'Produit B', price: 30 },
-  { id: 3, name: 'Produit C', price: 15 },
-  { id: 4, name: 'Produit D', price: 50 },
-  { id: 5, name: 'Produit E', price: 45 },
-  { id: 6, name: 'Produit F', price: 10 },
-  { id: 7, name: 'Produit G', price: 60 },
-  { id: 8, name: 'Produit H', price: 25 },
   // Ajoute plus si tu veux
 ];
 
@@ -16,7 +9,49 @@ export default function Product() {
   const [products, setProducts] = useState(initialProducts);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
+  const { token } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // URL de l'API
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${apiUrl}/api/products`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur de chargement des données');
+        }
+
+        const data = await response.json();
+        setProducts(data.products || initialProducts);
+        
+      } catch (err) {
+        console.error("Erreur de chargement:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchProducts();
+    } else {
+      // Pas de token, on peut remettre les produits initiaux ou vider la liste
+      setProducts(initialProducts);
+    }
+  }, [token]);
 
   // Filtrer les produits par recherche
   const filteredProducts = products.filter(product =>
@@ -45,7 +80,7 @@ export default function Product() {
   };
 
   const handleAdd = () => {
-    alert('Ajouter un nouveau produit (à implémenter)');
+    navigate('/ajout_produits');
   };
 
   return (
@@ -68,45 +103,56 @@ export default function Product() {
         </button>
       </div>
 
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-300 px-4 py-2 text-left">ID</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Nom</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Prix (€)</th>
-            <th className="border border-gray-300 px-4 py-2 text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentProducts.length === 0 ? (
-            <tr>
-              <td colSpan="4" className="text-center p-4">Aucun produit trouvé</td>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {loading ? (
+        <p>Chargement...</p>
+      ) : (
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-300 px-4 py-2 text-left">ID</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Nom</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Prix unitaire(Ar)</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">quantite</th>
+              <th className="border border-gray-300 px-4 py-2 text-center">Actions</th>
             </tr>
-          ) : (
-            currentProducts.map(product => (
-              <tr key={product.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">{product.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{product.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{product.price.toFixed(2)}</td>
-                <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    onClick={() => handleEdit(product.id)}
-                    className="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(product.id)}
-                    className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </td>
+          </thead>
+          <tbody>
+            {currentProducts.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="text-center p-4">Aucun produit trouvé</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              currentProducts.map(product => (
+                <tr key={product.id} className="hover:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">{product.id}</td>
+                  <td className="border border-gray-300 px-4 py-2">{product.name}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {product.unitPrice}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {product.quantity}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
+                    <button
+                      onClick={() => handleEdit(product.id)}
+                      className="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      )}
 
       {/* Pagination */}
       <div className="flex justify-between mt-4">
@@ -120,7 +166,7 @@ export default function Product() {
         <span>Page {currentPage} / {totalPages}</span>
         <button
           onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || totalPages === 0}
           className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
         >
           Suivant
