@@ -43,7 +43,7 @@ export default function Footer() {
         {/* Bas de page */}
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} MRO Management Ressource Organizer. Tous droits réservés.
+            &copy; {new Date().getFullYear()} PUROJEKUTO - Tous droits réservés. Solution MRO v1.0
           </p>
         </div>
       </div>

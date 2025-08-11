@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { AppContext } from './../../Context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaPlus, FaUserCircle,FaRegEdit,FaSearch } from 'react-icons/fa';
+import { MdOutlineDeleteOutline } from "react-icons/md";
 const initialProducts = [
   // Ajoute plus si tu veux
 ];
@@ -36,7 +38,7 @@ export default function Product() {
 
         const data = await response.json();
         setProducts(data.products || initialProducts);
-        
+
       } catch (err) {
         console.error("Erreur de chargement:", err);
         setError(err.message);
@@ -88,17 +90,21 @@ export default function Product() {
       <h1 className="text-2xl font-bold mb-4">Liste des produits</h1>
 
       <div className="flex justify-between mb-4">
-        <input
-          type="text"
-          placeholder="Rechercher un produit..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="border border-gray-400 rounded px-3 py-2 w-1/3"
-        />
+        <div className="flex items-center border border-gray-400 rounded px-3 py-2 w-1/3">
+          <FaSearch className="text-gray-500 mr-2" />
+          <input
+            type="text"
+            placeholder="Rechercher un produit..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="outline-none w-full"
+          />
+        </div>
         <button
           onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
+          <FaPlus />
           Ajouter un produit
         </button>
       </div>
@@ -110,10 +116,10 @@ export default function Product() {
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2 text-left">ID</th>
+              <th className="border border-gray-300 px-4 py-2 text-left"># ID</th>
               <th className="border border-gray-300 px-4 py-2 text-left">Nom</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Prix unitaire(Ar)</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">quantite</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Prix unitaire (Ar)</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Quantité</th>
               <th className="border border-gray-300 px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
@@ -133,20 +139,21 @@ export default function Product() {
                   <td className="border border-gray-300 px-4 py-2">
                     {product.quantity}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
+                  <td className="border border-gray-300 px-4 py-2 text-center space-x-3">
                     <button
                       onClick={() => handleEdit(product.id)}
-                      className="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500"
+                      className="bg-yellow-400 text-white px-4 py-2 rounded-lg hover:bg-yellow-500 text-lg"
                     >
-                      Edit
+                      <FaRegEdit size={20} />
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-lg"
                     >
-                      Delete
+                      <MdOutlineDeleteOutline size={20} />
                     </button>
                   </td>
+
                 </tr>
               ))
             )}

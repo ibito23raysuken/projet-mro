@@ -65,7 +65,7 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br  p-4 relative overflow-hidden">
+    <div className="m-8 flex items-center justify-center bg-gradient-to-br   relative overflow-hidden">
       {/* Fond avec éléments décoratifs */}
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png')] opacity-10"></div>
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full opacity-10 blur-3xl"></div>

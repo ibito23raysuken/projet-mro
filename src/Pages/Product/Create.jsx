@@ -103,6 +103,7 @@ export default function CreateProduct() {
         <div className="min-h-screen bg-gray-100 flex items-center justify-center py-6">
             <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-lg">
                 <h2 className="text-2xl font-bold mb-4 text-gray-800">
+                   
                     Ajouter un produit
                 </h2>
                 
