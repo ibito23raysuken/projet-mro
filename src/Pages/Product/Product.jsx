@@ -3,6 +3,7 @@ import { AppContext } from './../../Context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaPlus, FaUserCircle,FaRegEdit,FaSearch } from 'react-icons/fa';
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import EditProductModal from '../../Components/EditProductModal/EditProductModal';
 const initialProducts = [
   // Ajoute plus si tu veux
 ];
@@ -19,6 +20,10 @@ export default function Product() {
 
   // URL de l'API
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  //modal variable 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -71,14 +76,64 @@ export default function Product() {
     setCurrentPage(1); // reset page à 1 à chaque recherche
   };
 
+    // Enregistrer les changements (local ici, mais peut faire API)
+const handleSave = async (updatedProduct) => {
+  try {
+    setLoading(true);
+    
+    // Calculate quantity difference
+    const oldProduct = products.find(p => p.id === updatedProduct.id);
+    const quantityDiff = updatedProduct.quantity - oldProduct.quantity;
+    
+    if (quantityDiff === 0) {
+      setModalOpen(false);
+      return;
+    }
+
+    const response = await fetch(
+      `${apiUrl}/api/products/${updatedProduct.id}/stock`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          operation: quantityDiff > 0 ? 'increase' : 'decrease',
+          quantity: Math.abs(quantityDiff)
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to update stock');
+    }
+
+    // Update local state
+    setProducts(prev => 
+      prev.map(p => p.id === updatedProduct.id ? updatedProduct : p)
+    );
+    setModalOpen(false);
+    
+  } catch (err) {
+    console.error("Stock update error:", err);
+    setError(err.message);
+    // Optionally revert the quantity in UI
+    setSelectedProduct(oldProduct); 
+  } finally {
+    setLoading(false);
+  }
+};
   const handleDelete = (id) => {
     if (window.confirm('Voulez-vous vraiment supprimer ce produit ?')) {
       setProducts(prev => prev.filter(p => p.id !== id));
     }
   };
 
-  const handleEdit = (id) => {
-    alert(`Éditer le produit ${id} (à implémenter)`);
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setModalOpen(true);
   };
 
   const handleAdd = () => {
@@ -141,7 +196,7 @@ export default function Product() {
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center space-x-3">
                     <button
-                      onClick={() => handleEdit(product.id)}
+                      onClick={() => handleEdit(product)}
                       className="bg-yellow-400 text-white px-4 py-2 rounded-lg hover:bg-yellow-500 text-lg"
                     >
                       <FaRegEdit size={20} />
@@ -179,6 +234,13 @@ export default function Product() {
           Suivant
         </button>
       </div>
+            {/* Modal d’édition */}
+      <EditProductModal 
+        open={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        product={selectedProduct} 
+        onSave={handleSave} 
+      />
     </div>
   );
 }
