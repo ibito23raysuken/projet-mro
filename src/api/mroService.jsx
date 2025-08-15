@@ -48,14 +48,14 @@ export const MroService = {
   }
 
   const data = await response.json();
-  console.log("Data fetched from API:", data);
+  //console.log("Data fetched from API:", data);
   // Retournez un objet standardisé contenant les données et les infos de pagination
   return {
     products: data.content || data.data || data, // Adaptez selon la structure de votre API
     pagination: {
       currentPage: data.number || params.page,
       totalPages: data.totalPage || Math.ceil(data.totalElements / params.size),
-      totalItems: data.size || data.total
+      totalItems: data.totalElements || data.total
     }
   };
 },

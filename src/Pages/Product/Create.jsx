@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AppContext } from './../../Context/AppContext';
 import { useNavigate } from 'react-router-dom';
-
+import { MroService } from '../../api/mroService';
 export default function CreateProduct() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -23,19 +23,17 @@ export default function CreateProduct() {
             setError(null);
 
             try {
-                const response = await fetch(`${apiUrl}/api/products/types`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!response.ok) {
+                const response = await MroService.getProductTypes(token); // Ajout du token manquant
+               // console.log("Types fetched:", response);
+                
+                // La réponse est déjà parsée par MroService, pas besoin de .json()
+                if (!response) {
                     throw new Error('Erreur de chargement des types de produits');
                 }
 
-                const data = await response.json();
-                setTypes(Array.isArray(data) ? data : data.content || []);
-                
+                // Utilisation directe de response qui contient déjà les données parsées
+                setTypes(Array.isArray(response) ? response : response.content || []);
+
             } catch (err) {
                 console.error("Erreur de chargement:", err);
                 setError(err.message);

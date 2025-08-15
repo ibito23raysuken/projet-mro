@@ -43,9 +43,8 @@ export default function Product() {
     setError(null);
 
     try {
-      const { products: fetchedProducts, pagination: apiPagination } = 
-        await MroService.getProducts(searchParams, token);
-      console.log("Fetched products:", fetchedProducts);
+      const { products: fetchedProducts, pagination: apiPagination } = await MroService.getProducts(searchParams, token);
+      //console.log("Fetched products:", fetchedProducts);
       setProducts(fetchedProducts.products);
       setPagination({
         currentPage: apiPagination.currentPage + 1, // Convertir en 1-based
@@ -54,7 +53,7 @@ export default function Product() {
       });
     } catch (err) {
       setError(err.message);
-      console.error("Fetch products error:", err);
+      //console.error("Fetch products error:", err);
     } finally {
       setLoading(false);
     }
@@ -196,12 +195,7 @@ export default function Product() {
         </div>
       </div>
 
-      {/* Messages d'erreur */}
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700">
-          <p>{error}</p>
-        </div>
-      )}
+
 
       {/* Tableau des produits */}
       <div className="overflow-x-auto bg-white rounded-lg shadow">
