@@ -45,12 +45,7 @@ export default function TopBar() {
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="bg-royal-blue-600 hover:bg-royal-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-              >
-                Connexion
-              </Link>
+              <></>
             )}
           </div>
 

@@ -13,7 +13,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={token ? <Product /> : <Home />} />
+          <Route index element={token ? <Product /> : <Login />} />
           <Route path="/login" element={token ? <Product /> : <Login />}/>
           <Route path="/ajout_produits" element={token ? <CreateProduct /> : <Login />}/>
         </Route>
