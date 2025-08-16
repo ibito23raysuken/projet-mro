@@ -278,82 +278,137 @@ export default function Product() {
               </tbody>
             </table>
 
-            {/* Pagination */}
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Affichage de <span className="font-medium">{products.length}</span> sur{' '}
-                    <span className="font-medium">{pagination.totalItems}</span> produits
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <button
-                      onClick={() => handlePageChange(1)}
-                      disabled={pagination.currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <span className="sr-only">Première page</span>
-                      «
-                    </button>
-                    <button
-                      onClick={() => handlePageChange(pagination.currentPage - 1)}
-                      disabled={pagination.currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <span className="sr-only">Précédent</span>
-                      ‹
-                    </button>
+{/* Pagination - Version modifiée */}
+<div className="bg-white px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 sm:px-6">
+  <div className="mb-2 sm:mb-0">
+    <p className="text-sm text-gray-700">
+      Affichage de <span className="font-medium">{products.length}</span> sur{' '}
+      <span className="font-medium">{pagination.totalItems}</span> produits
+    </p>
+  </div>
+  
+  <div className="w-full sm:w-auto">
+    <nav className="flex items-center justify-between sm:justify-start">
+      {/* Boutons de navigation - version mobile simplifiée */}
+      <div className="flex sm:hidden space-x-2">
+        <button
+          onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+          disabled={pagination.currentPage === 1}
+          className="px-3 py-1 border rounded text-sm font-medium disabled:opacity-50"
+        >
+          Précédent
+        </button>
+        <span className="px-3 py-1 text-sm">
+          {pagination.currentPage}/{pagination.totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+          disabled={pagination.currentPage === pagination.totalPages}
+          className="px-3 py-1 border rounded text-sm font-medium disabled:opacity-50"
+        >
+          Suivant
+        </button>
+      </div>
+      
+      {/* Boutons de navigation - version desktop complète */}
+      <div className="hidden sm:flex space-x-1">
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={pagination.currentPage === 1}
+          className="px-2 py-1 rounded-l border text-sm font-medium disabled:opacity-50"
+          title="Première page"
+        >
+          «
+        </button>
+        <button
+          onClick={() => handlePageChange(pagination.currentPage - 1)}
+          disabled={pagination.currentPage === 1}
+          className="px-2 py-1 border text-sm font-medium disabled:opacity-50"
+          title="Précédent"
+        >
+          ‹
+        </button>
 
-                    {/* Affichage des pages */}
-                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (pagination.totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (pagination.currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                        pageNum = pagination.totalPages - 4 + i;
-                      } else {
-                        pageNum = pagination.currentPage - 2 + i;
-                      }
+        {/* Affichage des pages (limitée à 3 éléments sur mobile si vous voulez l'afficher) */}
+        {(() => {
+          const pages = [];
+          const totalDisplayPages = 5;
+          let startPage, endPage;
+          
+          if (pagination.totalPages <= totalDisplayPages) {
+            startPage = 1;
+            endPage = pagination.totalPages;
+          } else {
+            const maxPagesBeforeCurrent = Math.floor(totalDisplayPages / 2);
+            const maxPagesAfterCurrent = Math.ceil(totalDisplayPages / 2) - 1;
+            
+            if (pagination.currentPage <= maxPagesBeforeCurrent) {
+              startPage = 1;
+              endPage = totalDisplayPages;
+            } else if (pagination.currentPage + maxPagesAfterCurrent >= pagination.totalPages) {
+              startPage = pagination.totalPages - totalDisplayPages + 1;
+              endPage = pagination.totalPages;
+            } else {
+              startPage = pagination.currentPage - maxPagesBeforeCurrent;
+              endPage = pagination.currentPage + maxPagesAfterCurrent;
+            }
+          }
 
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => handlePageChange(pageNum)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            pagination.currentPage === pageNum
-                              ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
+          if (startPage > 1) {
+            pages.push(
+              <span key="start-ellipsis" className="px-2 py-1 text-sm">
+                ...
+              </span>
+            );
+          }
 
-                    <button
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      disabled={pagination.currentPage === pagination.totalPages}
-                      className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <span className="sr-only">Suivant</span>
-                      ›
-                    </button>
-                    <button
-                      onClick={() => handlePageChange(pagination.totalPages)}
-                      disabled={pagination.currentPage === pagination.totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <span className="sr-only">Dernière page</span>
-                      »
-                    </button>
-                  </nav>
-                </div>
-              </div>
-            </div>
+          for (let i = startPage; i <= endPage; i++) {
+            pages.push(
+              <button
+                key={i}
+                onClick={() => handlePageChange(i)}
+                className={`px-3 py-1 border text-sm font-medium ${
+                  pagination.currentPage === i
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {i}
+              </button>
+            );
+          }
+
+          if (endPage < pagination.totalPages) {
+            pages.push(
+              <span key="end-ellipsis" className="px-2 py-1 text-sm">
+                ...
+              </span>
+            );
+          }
+
+          return pages;
+        })()}
+
+        <button
+          onClick={() => handlePageChange(pagination.currentPage + 1)}
+          disabled={pagination.currentPage === pagination.totalPages}
+          className="px-2 py-1 border text-sm font-medium disabled:opacity-50"
+          title="Suivant"
+        >
+          ›
+        </button>
+        <button
+          onClick={() => handlePageChange(pagination.totalPages)}
+          disabled={pagination.currentPage === pagination.totalPages}
+          className="px-2 py-1 rounded-r border text-sm font-medium disabled:opacity-50"
+          title="Dernière page"
+        >
+          »
+        </button>
+      </div>
+    </nav>
+  </div>
+</div>
           </>
         )}
       </div>
