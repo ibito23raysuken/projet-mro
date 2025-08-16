@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../../Context/AppContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation  } from 'react-router-dom';
 import { FaPlus, FaUserCircle, FaRegEdit, FaSearch } from 'react-icons/fa';
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import EditProductModal from '../../Components/EditProductModal/EditProductModal';
@@ -11,7 +11,8 @@ export default function Product() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+  const [success, setSuccess] = useState(false);
+  const location = useLocation();
   // États pour la pagination et la recherche
   const [searchParams, setSearchParams] = useState({
     keyword: '',
@@ -36,6 +37,16 @@ export default function Product() {
   // URL de l'API
   const apiUrl = import.meta.env.VITE_API_URL;
 
+  // Effet pour afficher le message de succès après la création d'un produit
+  useEffect(() => {
+    if (location.state?.success) {
+      setSuccess(true);
+      
+      // Efface l'état après affichage (optionnel)
+      const timer = setTimeout(() => setSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
   // Fetch products avec memoization
   const fetchProducts = useCallback(async () => {
     if (!token) return;
@@ -163,11 +174,15 @@ export default function Product() {
   const handleAdd = () => {
     navigate('/ajout_produits');
   };
-
+  console.log("etat de success", success);
   return (
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Gestion des Produits</h1>
-
+                {success && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                        Produit créé avec succès!
+                    </div>
+                )}
       {/* Barre de recherche et bouton d'ajout */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
         <div className="relative flex-grow max-w-md">

@@ -88,7 +88,10 @@ export default function CreateProduct() {
             }
 
             setSuccess(true);
-            
+            navigate('/', { 
+                state: { success: true } 
+                // Alternative : replace: true pour empêcher le retour
+            });
         } catch (error) {
             console.error("Erreur:", error);
             setError(error.message || "Erreur lors de la création du produit");
