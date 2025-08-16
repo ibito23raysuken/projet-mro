@@ -242,9 +242,9 @@ export default function Product() {
                     <tr key={product.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <Link to={`/products/${product.id}`} className="text-blue-600 hover:text-blue-800">
+                        <div  className="text-blue-600 hover:text-blue-800">
                           {product.name}
-                        </Link>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Intl.NumberFormat('fr-FR').format(product.unitPrice)}
