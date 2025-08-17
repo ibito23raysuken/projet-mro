@@ -55,15 +55,16 @@ export default function EditProductModal({ open, onClose, product, onSave, loadi
             <Remove />
           </IconButton>
           
-          <TextField
-            value={localQuantity}
-            onChange={(e) => {
-              const val = parseInt(e.target.value) || 0;
-              setLocalQuantity(Math.max(0, val));
-            }}
-            inputProps={{ min: 0 }}
-            disabled={loading}
-          />
+        <TextField
+          type="number"
+          value={localQuantity}
+          onChange={(e) => {
+            const val = parseFloat(e.target.value) || 0;
+            setLocalQuantity(Math.max(0, val));
+          }}
+          inputProps={{ min: 0, step: "any" }} 
+          disabled={loading}
+        />
           
           <IconButton 
             onClick={() => setLocalQuantity(p => p + 1)}

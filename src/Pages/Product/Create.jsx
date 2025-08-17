@@ -167,7 +167,7 @@ export default function CreateProduct() {
                         <label className="block font-semibold text-gray-700">Quantité</label>
                         <input
                             type="number"
-                            step="1"
+                             step="0.01"
                             min="0"
                             className="w-full border border-gray-300 rounded-lg p-2 mt-1"
                             value={quantity}
