@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AppContext } from './../../Context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { MroService } from '../../api/mroService';
+import { FaPlus, FaArrowLeft } from "react-icons/fa";
 export default function CreateProduct() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -199,13 +200,26 @@ export default function CreateProduct() {
                     </div>
 
                     {/* Bouton */}
-                    <div className="text-right">
+                    <div className="flex justify-end gap-3">
+                        {/* Bouton Ajouter */}
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-blue-300"
+                            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-blue-300"
                             disabled={loading}
                         >
-                            {loading ? 'En cours...' : 'Ajouter'}
+                            <FaPlus />
+                            {loading ? "En cours..." : "Enregistrer"}
+                        </button>
+
+                        {/* Bouton Retour */}
+                        <button
+                            type="button"
+                            onClick={() => navigate(-1)}
+                            className="flex items-center gap-2 border border-gray-400 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-100 transition disabled:opacity-50"
+                            disabled={loading}
+                        >
+                            <FaArrowLeft />
+                            Retour
                         </button>
                     </div>
                 </form>
