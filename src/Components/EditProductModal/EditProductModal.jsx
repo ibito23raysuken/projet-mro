@@ -56,13 +56,12 @@ export default function EditProductModal({ open, onClose, product, onSave, loadi
           </IconButton>
           
         <TextField
-          type="number"
+          type="text"
           value={localQuantity}
           onChange={(e) => {
-            const val = parseFloat(e.target.value) || 0;
+            const val = parseFloat(e.target.value.replace(",", ".")) || 0;
             setLocalQuantity(Math.max(0, val));
           }}
-          inputProps={{ min: 0, step: "any" }} 
           disabled={loading}
         />
           
@@ -73,11 +72,6 @@ export default function EditProductModal({ open, onClose, product, onSave, loadi
             <Add />
           </IconButton>
         </Box>
-
-        <Typography color="textSecondary" mb={2}>
-          Modification: {localQuantity - product?.quantity} unités
-          ({localQuantity > product?.quantity ? 'augmentation' : 'réduction'})
-        </Typography>
 
         <Box display="flex" justifyContent="flex-end" gap={1}>
           <Button onClick={onClose} disabled={loading}>

@@ -287,10 +287,6 @@ export default function Product() {
 {/* Pagination - Version modifiée */}
 <div className="bg-white px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 sm:px-6">
   <div className="mb-2 sm:mb-0">
-    <p className="text-sm text-gray-700">
-      Affichage de <span className="font-medium">{products.length}</span> sur{' '}
-      <span className="font-medium">{pagination.totalItems}</span> produits
-    </p>
   </div>
   
   <div className="w-full sm:w-auto">
@@ -318,14 +314,6 @@ export default function Product() {
       
       {/* Boutons de navigation - version desktop complète */}
       <div className="hidden sm:flex space-x-1">
-        <button
-          onClick={() => handlePageChange(1)}
-          disabled={pagination.currentPage === 1}
-          className="px-2 py-1 rounded-l border text-sm font-medium disabled:opacity-50"
-          title="Première page"
-        >
-          «
-        </button>
         <button
           onClick={() => handlePageChange(pagination.currentPage - 1)}
           disabled={pagination.currentPage === 1}
@@ -402,14 +390,6 @@ export default function Product() {
           title="Suivant"
         >
           ›
-        </button>
-        <button
-          onClick={() => handlePageChange(pagination.totalPages)}
-          disabled={pagination.currentPage === pagination.totalPages}
-          className="px-2 py-1 rounded-r border text-sm font-medium disabled:opacity-50"
-          title="Dernière page"
-        >
-          »
         </button>
       </div>
     </nav>
