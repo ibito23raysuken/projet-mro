@@ -22,7 +22,7 @@ export default function Footer() {
           </div>
 
 
-          {/* Colonne 3 : Services */}
+          {/* Colonne 3 : Services 
           <div>
             <h3 className="text-lg font-semibold mb-4 border-l-4 border-blue-600 pl-3">Nos Services</h3>
             <ul className="space-y-2">
@@ -34,7 +34,7 @@ export default function Footer() {
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Solutions sur mesure</a></li>
             </ul>
           </div>
-
+*/}
         </div>
 
         {/* Séparateur */}

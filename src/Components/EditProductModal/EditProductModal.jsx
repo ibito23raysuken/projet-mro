@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AppContext } from './../../Context/AppContext';
-import { FaPlus, FaUserCircle, FaRegEdit, FaSearch } from 'react-icons/fa';
-import { MdOutlineDeleteOutline } from "react-icons/md";
+import React, { useState, useEffect } from 'react';
 import { 
   Modal, 
   Box, 
   Typography, 
   Button, 
   TextField, 
-  IconButton 
+  IconButton,
+  Radio,
+  RadioGroup,
+  FormControlLabel
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
 
@@ -24,16 +24,35 @@ const styleModal = {
   p: 4,
 };
 
-
 export default function EditProductModal({ open, onClose, product, onSave, loading }) {
-  const [localQuantity, setLocalQuantity] = useState(product?.quantity || 0);
+  const [localQuantity, setLocalQuantity] = useState(product?.quantity?.toString() || "");
+  const [mode, setMode] = useState("replace"); // "replace" ou "add"
 
   useEffect(() => {
-    if (product) setLocalQuantity(product.quantity);
+    if (product) setLocalQuantity(product.quantity.toString());
   }, [product]);
 
   const handleSave = () => {
-    onSave({ ...product, quantity: localQuantity });
+    const value = parseFloat(localQuantity.replace(",", ".")) || 0;
+    let newQuantity = product.quantity;
+
+    if (mode === "replace") {
+      newQuantity = value;
+    } else if (mode === "add") {
+      newQuantity = product.quantity + value;
+    }
+
+    onSave({ ...product, quantity: newQuantity });
+  };
+
+  const handleIncrement = () => {
+    const number = parseFloat(localQuantity.replace(",", ".")) || 0;
+    setLocalQuantity((number + 1).toString());
+  };
+
+  const handleDecrement = () => {
+    const number = parseFloat(localQuantity.replace(",", ".")) || 0;
+    setLocalQuantity(Math.max(0, number - 1).toString());
   };
 
   return (
@@ -42,33 +61,40 @@ export default function EditProductModal({ open, onClose, product, onSave, loadi
         <Typography variant="h6" mb={2}>
           Modifier le stock: {product?.name}
         </Typography>
-        
+
         <Typography mb={1}>
           Stock actuel: {product?.quantity}
         </Typography>
 
+        {/* Choix du mode */}
+        <RadioGroup 
+          row 
+          value={mode} 
+          onChange={(e) => setMode(e.target.value)} 
+          sx={{ mb: 2 }}
+        >
+          <FormControlLabel value="replace" control={<Radio />} label="Remplacer" />
+          <FormControlLabel value="add" control={<Radio />} label="Ajouter" />
+        </RadioGroup>
+
         <Box display="flex" alignItems="center" gap={1} mb={3}>
-          <IconButton 
-            onClick={() => setLocalQuantity(p => Math.max(0, p - 1))}
-            disabled={loading}
-          >
+          <IconButton onClick={handleDecrement} disabled={loading}>
             <Remove />
           </IconButton>
-          
-        <TextField
-          type="text"
-          value={localQuantity}
-          onChange={(e) => {
-            const val = parseFloat(e.target.value.replace(",", ".")) || 0;
-            setLocalQuantity(Math.max(0, val));
-          }}
-          disabled={loading}
-        />
-          
-          <IconButton 
-            onClick={() => setLocalQuantity(p => p + 1)}
+
+          <TextField
+            type="text"
+            value={localQuantity}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^[0-9]*[.,]?[0-9]*$/.test(val) || val === "") {
+                setLocalQuantity(val);
+              }
+            }}
             disabled={loading}
-          >
+          />
+
+          <IconButton onClick={handleIncrement} disabled={loading}>
             <Add />
           </IconButton>
         </Box>
@@ -77,12 +103,12 @@ export default function EditProductModal({ open, onClose, product, onSave, loadi
           <Button onClick={onClose} disabled={loading}>
             Annuler
           </Button>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             onClick={handleSave}
-            disabled={loading || localQuantity === product?.quantity}
+            disabled={loading}
           >
-            {loading ? 'Envoi...' : 'Confirmer'}
+            {loading ? "Envoi..." : "Confirmer"}
           </Button>
         </Box>
       </Box>
