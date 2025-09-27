@@ -225,11 +225,9 @@ export default function Product() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -266,11 +264,7 @@ export default function Product() {
                           {product.typeProduct?.name || 'Non spécifié'}
                         </span>
                       </td>
-                                            {/* Colonne Retirer */}
-                      <td className="px-6 py-4 text-center">
-
-                      </td>
-        
+                     
 
                                             {/* Colonne Quantité */}
                       <td className="px-6 py-4 text-center">
@@ -284,10 +278,7 @@ export default function Product() {
                           {product.quantity}
                         </span>
                       </td>
-                                            {/* Colonne Ajouter */}
-                      <td className="px-6 py-4 text-center">
-
-                      </td>
+                                   
 
                       {/* Colonne État */}
                       <td className="px-6 py-4 text-center">
@@ -306,37 +297,41 @@ export default function Product() {
                         )}
                       </td>
                       {/* Colonne Actions */}
-                      <td className="px-6 py-4 text-center">
-                                                <button
-                          onClick={(e) => {
-                            handleOpenModal(product, 'remove');
-                            createRipple(e);
-                          }}
-                          className="inline-flex items-center justify-center w-10 h-10 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
-                          title="Diminuer le stock"
-                        >
-                          <FaMinus size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            handleOpenModal(product, 'add');
-                            createRipple(e);
-                          }}
-                          className="inline-flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
-                          title="Augmenter le stock"
-                        >
-                          <FaPlus size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            handleDelete(product.id);
-                            createRipple(e);
-                          }}
-                          className="inline-flex items-center justify-center w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
-                          title="Supprimer le produit"
-                        >
-                          <MdOutlineDeleteOutline size={16} />
-                        </button>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              handleOpenModal(product, 'remove');
+                              createRipple(e);
+                            }}
+                            className="inline-flex items-center justify-center w-8 h-8 bg-orange-100 hover:bg-orange-200 text-orange-700 hover:text-orange-800 transition-colors duration-200"
+                            title="Diminuer le stock"
+                          >
+                            <FaMinus size={12} />
+                          </button>
+                          
+                          <button
+                            onClick={(e) => {
+                              handleOpenModal(product, 'add');
+                              createRipple(e);
+                            }}
+                            className="inline-flex items-center justify-center w-8 h-8 bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-800 transition-colors duration-200"
+                            title="Augmenter le stock"
+                          >
+                            <FaPlus size={12} />
+                          </button>
+                          
+                          <button
+                            onClick={(e) => {
+                              handleDelete(product.id);
+                              createRipple(e);
+                            }}
+                            className="inline-flex items-center justify-center w-8 h-8 bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800 transition-colors duration-200"
+                            title="Supprimer le produit"
+                          >
+                            <MdOutlineDeleteOutline size={12} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
