@@ -268,16 +268,7 @@ export default function Product() {
                       </td>
                                             {/* Colonne Retirer */}
                       <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={(e) => {
-                            handleOpenModal(product, 'remove');
-                            createRipple(e);
-                          }}
-                          className="inline-flex items-center justify-center w-10 h-10 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
-                          title="Diminuer le stock"
-                        >
-                          <FaMinus size={14} />
-                        </button>
+
                       </td>
         
 
@@ -295,16 +286,7 @@ export default function Product() {
                       </td>
                                             {/* Colonne Ajouter */}
                       <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={(e) => {
-                            handleOpenModal(product, 'add');
-                            createRipple(e);
-                          }}
-                          className="inline-flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
-                          title="Augmenter le stock"
-                        >
-                          <FaPlus size={14} />
-                        </button>
+
                       </td>
 
                       {/* Colonne État */}
@@ -325,6 +307,26 @@ export default function Product() {
                       </td>
                       {/* Colonne Actions */}
                       <td className="px-6 py-4 text-center">
+                                                <button
+                          onClick={(e) => {
+                            handleOpenModal(product, 'remove');
+                            createRipple(e);
+                          }}
+                          className="inline-flex items-center justify-center w-10 h-10 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
+                          title="Diminuer le stock"
+                        >
+                          <FaMinus size={14} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            handleOpenModal(product, 'add');
+                            createRipple(e);
+                          }}
+                          className="inline-flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
+                          title="Augmenter le stock"
+                        >
+                          <FaPlus size={14} />
+                        </button>
                         <button
                           onClick={(e) => {
                             handleDelete(product.id);
