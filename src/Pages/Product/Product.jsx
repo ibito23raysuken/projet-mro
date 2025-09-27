@@ -266,34 +266,7 @@ export default function Product() {
                           {product.typeProduct?.name || 'Non spécifié'}
                         </span>
                       </td>
-                      
-        
-                      {/* Colonne Ajouter */}
-                      <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={(e) => {
-                            handleOpenModal(product, 'add');
-                            createRipple(e);
-                          }}
-                          className="inline-flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
-                          title="Augmenter le stock"
-                        >
-                          <FaPlus size={14} />
-                        </button>
-                      </td>
-                                            {/* Colonne Quantité */}
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex px-3 py-2 rounded-full text-sm font-bold ${
-                          product.quantity === 0 
-                            ? 'bg-red-100 text-red-800 border border-red-200' 
-                            : product.quantity <= 10 
-                            ? 'bg-orange-100 text-orange-800 border border-orange-200' 
-                            : 'bg-green-100 text-green-800 border border-green-200'
-                        }`}>
-                          {product.quantity}
-                        </span>
-                      </td>
-                      {/* Colonne Retirer */}
+                                            {/* Colonne Retirer */}
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={(e) => {
@@ -306,6 +279,34 @@ export default function Product() {
                           <FaMinus size={14} />
                         </button>
                       </td>
+        
+
+                                            {/* Colonne Quantité */}
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex px-3 py-2 rounded-full text-sm font-bold ${
+                          product.quantity === 0 
+                            ? 'bg-red-100 text-red-800 border border-red-200' 
+                            : product.quantity <= 10 
+                            ? 'bg-orange-100 text-orange-800 border border-orange-200' 
+                            : 'bg-green-100 text-green-800 border border-green-200'
+                        }`}>
+                          {product.quantity}
+                        </span>
+                      </td>
+                                            {/* Colonne Ajouter */}
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={(e) => {
+                            handleOpenModal(product, 'add');
+                            createRipple(e);
+                          }}
+                          className="inline-flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
+                          title="Augmenter le stock"
+                        >
+                          <FaPlus size={14} />
+                        </button>
+                      </td>
+
                       {/* Colonne État */}
                       <td className="px-6 py-4 text-center">
                         {product.quantity <= 10 ? (
