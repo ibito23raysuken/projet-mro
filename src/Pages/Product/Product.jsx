@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../../Context/AppContext';
-import { Link, useNavigate,useLocation  } from 'react-router-dom';
-import { FaPlus, FaUserCircle, FaRegEdit, FaSearch } from 'react-icons/fa';
-import { MdOutlineDeleteOutline } from "react-icons/md";
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaPlus, FaUserCircle, FaRegEdit, FaSearch, FaMinus, FaBox } from 'react-icons/fa';
+import { MdOutlineDeleteOutline, MdInventory2 } from "react-icons/md";
 import EditProductModal from '../../Components/EditProductModal/EditProductModal';
 import { MroService } from '../../api/mroService';
 
@@ -13,41 +13,35 @@ export default function Product() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const location = useLocation();
-  // États pour la pagination et la recherche
+  
   const [searchParams, setSearchParams] = useState({
     keyword: '',
-    page: 0,  // Page 0-based pour l'API
-    size: 5  // Nombre d'éléments par page
+    page: 0,
+    size: 5
   });
   
   const [pagination, setPagination] = useState({
-    currentPage: 1,  // Page 1-based pour l'UI
+    currentPage: 1,
     totalPages: 1,
     totalItems: 0
   });
 
-  // États pour la modale d'édition
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalMode, setModalMode] = useState('add');
 
-  // Contexte et navigation
   const { token } = useContext(AppContext);
   const navigate = useNavigate();
-
-  // URL de l'API
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  // Effet pour afficher le message de succès après la création d'un produit
   useEffect(() => {
     if (location.state?.success) {
       setSuccess(true);
-      
-      // Efface l'état après affichage (optionnel)
       const timer = setTimeout(() => setSuccess(false), 5000);
       return () => clearTimeout(timer);
     }
   }, [location.state]);
-  // Fetch products avec memoization
+  
   const fetchProducts = useCallback(async () => {
     if (!token) return;
     setLoading(true);
@@ -55,31 +49,27 @@ export default function Product() {
 
     try {
       const { products: fetchedProducts, pagination: apiPagination } = await MroService.getProducts(searchParams, token);
-      //console.log("Fetched products:", fetchedProducts);
       setProducts(fetchedProducts.products);
       setPagination({
-        currentPage: apiPagination.currentPage + 1, // Convertir en 1-based
+        currentPage: apiPagination.currentPage + 1,
         totalPages: apiPagination.totalPages,
         totalItems: apiPagination.totalItems
       });
     } catch (err) {
       setError(err.message);
-      //console.error("Fetch products error:", err);
     } finally {
       setLoading(false);
     }
   }, [token, searchParams]);
 
-  // Effet pour charger les produits
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Gestionnaires d'événements
   const handlePageChange = (newPage) => {
     setSearchParams(prev => ({
       ...prev,
-      page: newPage - 1 // Convertir en 0-based
+      page: newPage - 1
     }));
   };
 
@@ -88,20 +78,13 @@ export default function Product() {
     setSearchParams(prev => ({
       ...prev,
       keyword,
-      page: 0 // Reset à la première page
-    }));
-  };
-
-  const handlePageSizeChange = (e) => {
-    setSearchParams(prev => ({
-      ...prev,
-      size: 5,
       page: 0
     }));
   };
 
-  const handleEdit = (product) => {
+  const handleOpenModal = (product, mode) => {
     setSelectedProduct(product);
+    setModalMode(mode);
     setModalOpen(true);
   };
 
@@ -121,7 +104,6 @@ export default function Product() {
         throw new Error('Échec de la suppression');
       }
 
-      // Recharger les produits après suppression
       await fetchProducts();
     } catch (err) {
       setError(err.message);
@@ -134,7 +116,6 @@ export default function Product() {
     try {
       setLoading(true);
       
-      // Calculer la différence de quantité
       const oldProduct = products.find(p => p.id === updatedProduct.id);
       const quantityDiff = updatedProduct.quantity - oldProduct.quantity;
       
@@ -160,7 +141,6 @@ export default function Product() {
         }
       }
 
-      // Mettre à jour les données locales
       await fetchProducts();
       setModalOpen(false);
     } catch (err) {
@@ -174,16 +154,40 @@ export default function Product() {
   const handleAdd = () => {
     navigate('/ajout_produits');
   };
-  console.log("etat de success", success);
+
+  const createRipple = (event) => {
+    const button = event.currentTarget;
+    const circle = document.createElement("span");
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+    circle.classList.add("ripple");
+
+    const ripple = button.getElementsByClassName("ripple")[0];
+    if (ripple) ripple.remove();
+
+    button.appendChild(circle);
+    
+    setTimeout(() => {
+      if (circle.parentElement === button) {
+        button.removeChild(circle);
+      }
+    }, 600);
+  };
+
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <div className="max-w-7xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Gestion des Produits</h1>
-                {success && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                        Produit créé avec succès!
-                    </div>
-                )}
-      {/* Barre de recherche et bouton d'ajout */}
+      
+      {success && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          Produit créé avec succès!
+        </div>
+      )}
+      
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
         <div className="relative flex-grow max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -199,7 +203,6 @@ export default function Product() {
         </div>
         
         <div className="flex gap-3">
-          
           <button
             onClick={handleAdd}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
@@ -210,9 +213,6 @@ export default function Product() {
         </div>
       </div>
 
-
-
-      {/* Tableau des produits */}
       <div className="overflow-x-auto bg-white rounded-lg shadow">
         {loading ? (
           <div className="p-8 text-center">
@@ -223,61 +223,116 @@ export default function Product() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  {/*<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix (Ar)</th>*/}
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                      {searchParams.keyword ? 'Aucun résultat trouvé' : 'Aucun produit disponible'}
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <div className="text-gray-400 mb-2">
+                        <MdInventory2 className="text-4xl mx-auto" />
+                      </div>
+                      <p className="text-gray-500 text-lg">
+                        {searchParams.keyword ? 'Aucun résultat trouvé' : 'Aucun produit disponible'}
+                      </p>
                     </td>
                   </tr>
                 ) : (
                   products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <div  className="text-blue-600 hover:text-blue-800">
-                          {product.name}
+                    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                      {/* Colonne Produit */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <FaBox className="text-blue-600" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900">{product.name}</div>
+                            <div className="text-sm text-gray-500">REF: {product.id}</div>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <div  className="text-blue-600 hover:text-blue-800">
-                          {product.typeProduct.name}
-                        </div>
+                      
+                      {/* Colonne Type */}
+                      <td className="px-6 py-4">
+                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          {product.typeProduct?.name || 'Non spécifié'}
+                        </span>
                       </td>
-                      {/*
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Intl.NumberFormat('fr-FR').format(product.unitPrice)}
+                      
+        
+                      {/* Colonne Ajouter */}
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={(e) => {
+                            handleOpenModal(product, 'add');
+                            createRipple(e);
+                          }}
+                          className="inline-flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
+                          title="Augmenter le stock"
+                        >
+                          <FaPlus size={14} />
+                        </button>
                       </td>
-                      */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          product.quantity > 10 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                            {/* Colonne Quantité */}
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex px-3 py-2 rounded-full text-sm font-bold ${
+                          product.quantity === 0 
+                            ? 'bg-red-100 text-red-800 border border-red-200' 
+                            : product.quantity <= 10 
+                            ? 'bg-orange-100 text-orange-800 border border-orange-200' 
+                            : 'bg-green-100 text-green-800 border border-green-200'
                         }`}>
                           {product.quantity}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {/* Colonne Retirer */}
+                      <td className="px-6 py-4 text-center">
                         <button
-                          onClick={() => handleEdit(product)}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
-                          title="Modifier"
+                          onClick={(e) => {
+                            handleOpenModal(product, 'remove');
+                            createRipple(e);
+                          }}
+                          className="inline-flex items-center justify-center w-10 h-10 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
+                          title="Diminuer le stock"
                         >
-                          <FaRegEdit size={16} />
+                          <FaMinus size={14} />
                         </button>
+                      </td>
+                      {/* Colonne État */}
+                      <td className="px-6 py-4 text-center">
+                        {product.quantity <= 10 ? (
+                          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${
+                            product.quantity === 0 
+                              ? 'bg-red-500 text-white' 
+                              : 'bg-orange-500 text-white'
+                          }`}>
+                            {product.quantity === 0 ? '🔴 RUPTURE' : '🟠 FAIBLE'}
+                          </span>
+                        ) : (
+                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white">
+                            🟢 NORMAL
+                          </span>
+                        )}
+                      </td>
+                      {/* Colonne Actions */}
+                      <td className="px-6 py-4 text-center">
                         <button
-                          onClick={() => handleDelete(product.id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Supprimer"
+                          onClick={(e) => {
+                            handleDelete(product.id);
+                            createRipple(e);
+                          }}
+                          className="inline-flex items-center justify-center w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110"
+                          title="Supprimer le produit"
                         >
-                          <MdOutlineDeleteOutline size={18} />
+                          <MdOutlineDeleteOutline size={16} />
                         </button>
                       </td>
                     </tr>
@@ -286,129 +341,78 @@ export default function Product() {
               </tbody>
             </table>
 
-{/* Pagination - Version modifiée */}
-<div className="bg-white px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 sm:px-6">
-  <div className="mb-2 sm:mb-0">
-  </div>
-  
-  <div className="w-full sm:w-auto">
-    <nav className="flex items-center justify-between sm:justify-start">
-      {/* Boutons de navigation - version mobile simplifiée */}
-      <div className="flex sm:hidden space-x-2">
-        <button
-          onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
-          disabled={pagination.currentPage === 1}
-          className="px-3 py-1 border rounded text-sm font-medium disabled:opacity-50"
-        >
-          Précédent
-        </button>
-        <span className="px-3 py-1 text-sm">
-          {pagination.currentPage}/{pagination.totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
-          disabled={pagination.currentPage === pagination.totalPages}
-          className="px-3 py-1 border rounded text-sm font-medium disabled:opacity-50"
-        >
-          Suivant
-        </button>
-      </div>
-      
-      {/* Boutons de navigation - version desktop complète */}
-      <div className="hidden sm:flex space-x-1">
-        <button
-          onClick={() => handlePageChange(pagination.currentPage - 1)}
-          disabled={pagination.currentPage === 1}
-          className="px-2 py-1 border text-sm font-medium disabled:opacity-50"
-          title="Précédent"
-        >
-          ‹
-        </button>
-
-        {/* Affichage des pages (limitée à 3 éléments sur mobile si vous voulez l'afficher) */}
-        {(() => {
-          const pages = [];
-          const totalDisplayPages = 5;
-          let startPage, endPage;
-          
-          if (pagination.totalPages <= totalDisplayPages) {
-            startPage = 1;
-            endPage = pagination.totalPages;
-          } else {
-            const maxPagesBeforeCurrent = Math.floor(totalDisplayPages / 2);
-            const maxPagesAfterCurrent = Math.ceil(totalDisplayPages / 2) - 1;
-            
-            if (pagination.currentPage <= maxPagesBeforeCurrent) {
-              startPage = 1;
-              endPage = totalDisplayPages;
-            } else if (pagination.currentPage + maxPagesAfterCurrent >= pagination.totalPages) {
-              startPage = pagination.totalPages - totalDisplayPages + 1;
-              endPage = pagination.totalPages;
-            } else {
-              startPage = pagination.currentPage - maxPagesBeforeCurrent;
-              endPage = pagination.currentPage + maxPagesAfterCurrent;
-            }
-          }
-
-          if (startPage > 1) {
-            pages.push(
-              <span key="start-ellipsis" className="px-2 py-1 text-sm">
-                ...
-              </span>
-            );
-          }
-
-          for (let i = startPage; i <= endPage; i++) {
-            pages.push(
-              <button
-                key={i}
-                onClick={() => handlePageChange(i)}
-                className={`px-3 py-1 border text-sm font-medium ${
-                  pagination.currentPage === i
-                    ? 'bg-blue-50 border-blue-500 text-blue-600'
-                    : 'bg-white text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                {i}
-              </button>
-            );
-          }
-
-          if (endPage < pagination.totalPages) {
-            pages.push(
-              <span key="end-ellipsis" className="px-2 py-1 text-sm">
-                ...
-              </span>
-            );
-          }
-
-          return pages;
-        })()}
-
-        <button
-          onClick={() => handlePageChange(pagination.currentPage + 1)}
-          disabled={pagination.currentPage === pagination.totalPages}
-          className="px-2 py-1 border text-sm font-medium disabled:opacity-50"
-          title="Suivant"
-        >
-          ›
-        </button>
-      </div>
-    </nav>
-  </div>
-</div>
+            {/* Pagination */}
+            <div className="bg-white px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-700">
+                  Page {pagination.currentPage} sur {pagination.totalPages}
+                </span>
+              </div>
+              
+              <div className="flex space-x-2 mt-2 sm:mt-0">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1}
+                  className="px-3 py-1 border border-gray-300 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Précédent
+                </button>
+                
+                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  const pageNumber = i + 1;
+                  return (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      className={`px-3 py-1 border text-sm font-medium ${
+                        pagination.currentPage === pageNumber
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+                
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.totalPages}
+                  className="px-3 py-1 border border-gray-300 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Suivant
+                </button>
+              </div>
+            </div>
           </>
         )}
       </div>
 
-      {/* Modal d'édition */}
       <EditProductModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         product={selectedProduct}
         onSave={handleSave}
         loading={loading}
+        mode={modalMode}
       />
+
+      <style>{`
+        .ripple {
+          position: absolute;
+          border-radius: 50%;
+          background-color: rgba(255, 255, 255, 0.7);
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+        }
+        
+        @keyframes ripple {
+          to {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
